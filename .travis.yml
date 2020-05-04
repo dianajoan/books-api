@@ -1,0 +1,30 @@
+language: php
+
+dist: precise
+
+language: php
+
+php:
+  - 7.2
+
+env:
+  - DB_CONNECTION=sqlite
+  - DB=sqlite
+
+cache:
+  directories:
+    - node_modules
+    - vendor
+
+before_script:
+#   - sudo apt-get install php-sqlite3
+  - cp .env.travis .env
+  - composer self-update
+  - composer install --no-interaction
+  - composer refresh-db
+  - php artisan key:generate
+  - php artisan migrate:fresh --seed --no-interaction -vvv
+  - composer test
+
+script:
+  - vendor/bin/phpunit
