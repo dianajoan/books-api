@@ -35,7 +35,8 @@ class PostBookRequest extends FormRequest
             'isbn' => 'required|min:13|max:13|unique:books',
             'title' => 'required',
             'description' => 'required',
-            'authors' => 'required|array:integer'
+            'authors' => 'required|array|min:1'
+            // 'authors.0' => 'required'
         ];
     }
 

@@ -25,10 +25,12 @@ class BookReviewResource extends JsonResource
         return [
             // @TODO implement
             'id'        => $this->id,
-            'book_id'   => $this->book_id ? Book::where('id',$this->book_id)->first()->title : 'unknown book',
-            'user_id'   => $this->user_id ? User::where('id',$this->user_id)->first()->name : 'unknown book',
             'review'    => $this->review,
-            'comment'   => $this->comment
+            'comment'   => $this->comment,
+            'user'      => array(
+                'id'    => $this->user_id ? User::where('id',$this->user_id)->first()->id : '',
+                'name'  => $this->user_id ? User::where('id',$this->user_id)->first()->name : ''
+            )
         ];
     }
 }

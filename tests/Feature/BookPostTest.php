@@ -70,28 +70,28 @@ class BookPostTest extends TestCase
      * @dataProvider validationDataProvider
      */
     // restore - 4
-    // public function testValidation(array $invalidData, string $invalidParameter)
-    // {
-    //     $book = factory(Book::class)->create(['isbn' => '9788328302341']);
-    //     $user = factory(User::class)->state('admin')->create();
-    //     $authors = factory(Author::class, 2)->create();
-    //     $authorIds = $authors->pluck('id');
+    public function testValidation(array $invalidData, string $invalidParameter)
+    {
+        $book = factory(Book::class)->create(['isbn' => '9788328302341']);
+        $user = factory(User::class)->state('admin')->create();
+        $authors = factory(Author::class, 2)->create();
+        $authorIds = $authors->pluck('id');
 
-    //     $validData = [
-    //         'isbn' => '9788328347786',
-    //         'title' => 'Book title',
-    //         'description' => 'Lorem ipsum',
-    //         'authors' => $authorIds,
-    //     ];
-    //     $data = array_merge($validData, $invalidData);
+        $validData = [
+            'isbn' => '9788328347786',
+            'title' => 'Book title',
+            'description' => 'Lorem ipsum',
+            'authors' => $authorIds,
+        ];
+        $data = array_merge($validData, $invalidData);
 
-    //     $response = $this
-    //         ->actingAs($user)
-    //         ->postJson('/api/books', $data);
+        $response = $this
+            ->actingAs($user)
+            ->postJson('/api/books', $data);
 
-    //     $response->assertStatus(422);
-    //     $response->assertJsonValidationErrors([$invalidParameter]);
-    // }
+        $response->assertStatus(422);
+        $response->assertJsonValidationErrors([$invalidParameter]);
+    }
 
     public function validationDataProvider()
     {

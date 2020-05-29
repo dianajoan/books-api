@@ -4,15 +4,15 @@
 
 namespace App\Http\Controllers;
 
-use App\BookReview;
-use App\Http\Resources\BookReviewResource;
-use App\Http\Resources\BookReviewCollection;
-use App\Http\Requests\PostBookReviewRequest as BookReviewRequest;
-
 use App\Book;
 use App\Http\Resources\BookResource;
 use App\Http\Resources\BookCollection;
 use App\Http\Requests\PostBookRequest;
+
+use App\BookReview;
+use App\Http\Resources\BookReviewResource;
+use App\Http\Resources\BookReviewCollection;
+use App\Http\Requests\PostBookReviewRequest;
 
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,11 +20,22 @@ use Illuminate\Http\JsonResponse;
 use App\BookAuthor;
 
 use App\Author;
+use App\User;
 
 use Illuminate\Http\Request;
 
 class BooksController extends Controller
 {
+    /**
+     * Display the constructor of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function __construct()
+    {
+        $this->middleware('auth.admin')->except('getCollection','showBook', 'bookReview', 'showBookReview', 'updateBook', 'updateBookReview', 'destroy', 'deatroyBookReview');
+    }
+
     /**
      * Getting the collection for all books stored
      * A total of all books
@@ -45,7 +56,7 @@ class BooksController extends Controller
     {
         // @TODO implement
         foreach ($request->all() as $key => $value) {
-            if ($key != 'isbn' && $key != 'title' && $key != 'description' && $key != 'authors') {
+            if ($key != 'isbn' && $key != 'title' && $key != 'description' && $key != 'authors' && $key != 'api_token') {
                 return response()->json([
                     'error'  => 'No field found with name ' . $key
                 ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
@@ -84,15 +95,31 @@ class BooksController extends Controller
     public function postReview(int $bookId, PostBookReviewRequest $request)
     {
         // @TODO implement
+
+        $book = Book::find($bookId);
+
+        if (!$book) {
+            return response()->json([
+                'error' => 'Book not found!'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+        $req_user = User::find($request->user_id);
+
+        if (!$req_user) {
+            return response()->json([
+                'error' => 'User id does not exist!'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
         $book_rev = new BookReview();
-        $book_rev->book_id  = $request->bookId;
+        $book_rev->book_id  = $bookId;
         $book_rev->user_id  = $request->user_id;
         $book_rev->review   = $request->review;
         $book_rev->comment  = $request->comment;
         $book_rev->save();
 
         return response()->json([
-            'message' => 'Book added successfully',
             'data'  => new BookReviewResource($book_rev)
         ], JsonResponse::HTTP_CREATED);
     }
@@ -134,7 +161,26 @@ class BooksController extends Controller
                 'error' => 'No book reviews found'
             ], JsonResponse::HTTP_NOT_FOUND);
         }
-        return BookReviewCollection::collection(BookReview::paginate(15));   
+
+        $bookRevs = array();
+
+        foreach ($book->reviews as $bkrv) {
+            $bookRevs[] = array(
+                'id'        => $bkrv->id,
+                'review'    => $bkrv->review,
+                'comment'   => $bkrv->comment,
+                'user'      => array(
+                    'id'    => $bkrv->user_id ? User::where('id',$bkrv->user_id)->first()->id : '',
+                    'name'  => $bkrv->user_id ? User::where('id',$bkrv->user_id)->first()->name : ''
+                )
+            );
+        }
+
+        return response()->json([
+            'data' => $bookRevs
+        ], JsonResponse::HTTP_OK);
+
+        // return BookReviewCollection::collection(BookReview::paginate(15));   
     }
 
     // parttwo
@@ -150,7 +196,6 @@ class BooksController extends Controller
 
         return new BookReviewResource($book_review);
     }
-
 
     /**
      * Update the specified resource in storage.

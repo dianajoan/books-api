@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/dianajoan/books-api.svg?branch=master)](https://travis-ci.com/dianajoan/books-api)
+[![Build Status](https://travis-ci.org/dianajoan/books-api.svg?branch=master)](https://travis-ci.org/dianajoan/books-api)
 
 ## Introduction
 
