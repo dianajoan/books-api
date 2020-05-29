@@ -9,7 +9,6 @@ php:
 
 env:
   - DB_CONNECTION=sqlite
-  - DB=sqlite
 
 cache:
   directories:
