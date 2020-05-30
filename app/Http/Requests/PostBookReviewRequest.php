@@ -34,8 +34,8 @@ class PostBookReviewRequest extends FormRequest
         return [
             // @TODO implement
             // 'book_id'   => 'required|integer',
-            'user_id'   => 'required|integer',
-            'review'    => 'required|integer',
+            'review'    => 'required|integer|min:1|max:10',
+            // 'user_id'   => 'required|integer',
             'comment'   => 'required|string'
         ];
     }
@@ -47,11 +47,12 @@ class PostBookReviewRequest extends FormRequest
      */
     public function messages()
     {
+
         return [
-            // 'book_id.required' => 'A correct book id field is required',
-            'user_id.required' => 'The correct user id field is required',
-            'review.required' => 'The review field is required',
-            'comment.required' => 'You need to add atleat one author from the existing',
+            // 'book_id.required'  => 'A correct book id field is required',
+            // 'user_id.required'  => 'The correct user id field is required',
+            'review.required'   => 'The review field is required',
+            'comment.required'  => 'You need to add atleat one author from the existing'
         ];
     }
 

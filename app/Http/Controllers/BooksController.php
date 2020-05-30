@@ -67,8 +67,8 @@ class BooksController extends Controller
             $get_user = Author::where('id',$value)->first();
             if (!$get_user) {
                 return response()->json([
-                    'error'  => 'No author found with id ' . $value
-                ], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
+                    'errors'  => array('authors.0' => array('No author found with id ' . $value)
+                )], JsonResponse::HTTP_UNPROCESSABLE_ENTITY);
             }
         }
 
@@ -107,8 +107,12 @@ class BooksController extends Controller
         $req_user = User::find($request->user_id);
 
         if (!$req_user) {
+            $request->user_id = 1;
+        }
+
+        if (!$request->review) {
             return response()->json([
-                'error' => 'User id does not exist!'
+                'error' => 'Please enter a valid review!'
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 
