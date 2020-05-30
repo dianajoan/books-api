@@ -102,7 +102,6 @@ class BooksListTest extends TestCase
         $this->assertResponseContainsBooks($response, $book1, $book2);
     }
 
-    // retore - 1
     public function testAuthorsFilter()
     {
         $author1 = factory(Author::class)->create();
@@ -134,7 +133,6 @@ class BooksListTest extends TestCase
         $this->assertResponseContainsBooks($response, $book1, $book2, $book3);
     }
 
-    // restore - 2
     public function testTitleSort()
     {
         $book1 = factory(Book::class)->create(['title' => 'PHP for begginers']);
@@ -152,7 +150,6 @@ class BooksListTest extends TestCase
         $this->assertResponseContainsBooks($response, $book1, $book2, $book3);
     }
 
-    // restore - 3
     public function testAvgReviewSort()
     {
         $user = factory(User::class)->create();

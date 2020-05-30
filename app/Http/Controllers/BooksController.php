@@ -17,6 +17,7 @@ use App\Http\Requests\PostBookReviewRequest;
 use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request as PublicRequest;
 use App\BookAuthor;
 
 use App\Author;
@@ -41,9 +42,35 @@ class BooksController extends Controller
      * A total of all books
      * @return \Illuminate\Http\Response
      */
-    public function getCollection()
+    public function getCollection(PublicRequest $request)
     {
         // @TODO implement
+
+        if ( $request->sortColumn ) {
+            if ( $request->sortColumn === 'title' ) {
+                $books = Book::all();
+
+                $request->sortDirection ? ( $order = $request->sortDirection ) : ( $order = 'asc' );
+
+                if (sizeof($books) > 0) {
+                    return BookCollection::collection(Book::orderBy('title', $order)->paginate(15));
+                }
+
+            } elseif ( $request->sortColumn === 'avg_review') {
+
+                $outputBooks = BookCollection::collection(Book::all());
+                $one = $outputBooks[0];
+
+                return $outputBooks;  
+            }
+
+            return response()->json([
+                'error' => 'Sorry, no books found under that category!'
+            ], JsonResponse::HTTP_NOT_FOUND);
+        }
+
+
+
         if (sizeof(Book::all()) < 1) {
             return response()->json([
                 'error' => 'No books found'

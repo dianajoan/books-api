@@ -69,7 +69,6 @@ class BookPostTest extends TestCase
     /**
      * @dataProvider validationDataProvider
      */
-    // restore - 4
     public function testValidation(array $invalidData, string $invalidParameter)
     {
         $book = factory(Book::class)->create(['isbn' => '9788328302341']);

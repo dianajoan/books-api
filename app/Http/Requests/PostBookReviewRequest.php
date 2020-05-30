@@ -35,7 +35,6 @@ class PostBookReviewRequest extends FormRequest
             // @TODO implement
             // 'book_id'   => 'required|integer',
             'review'    => 'required|integer|min:1|max:10',
-            // 'user_id'   => 'required|integer',
             'comment'   => 'required|string'
         ];
     }

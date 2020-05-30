@@ -11,7 +11,6 @@ use Tests\TestCase;
 
 class BookReviewTest extends TestCase
 {
-    // restore - 5
     public function testDenyGuestAccess()
     {
         $book = factory(Book::class)->create();
@@ -24,7 +23,6 @@ class BookReviewTest extends TestCase
         $response->assertStatus(401);
     }
 
-    // restore - 6
     public function testError404OnInvalidBookId()
     {
         $user = factory(User::class)->state('admin')->create();
@@ -39,7 +37,6 @@ class BookReviewTest extends TestCase
         $response->assertStatus(404);
     }
 
-    // restore - 7
     public function testSuccessfulPost()
     {
         //$this->withoutExceptionHandling();
@@ -77,7 +74,6 @@ class BookReviewTest extends TestCase
     /**
      * @dataProvider validationDataProvider
      */
-    // restore - 8
     public function testValidation(array $invalidData, string $invalidParameter)
     {
         $book = factory(Book::class)->create(['isbn' => '9788328302341']);
