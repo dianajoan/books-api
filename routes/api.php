@@ -36,19 +36,24 @@ Route::get('/', [
 Route::apiResource('/users','UserController');
 
 
-Route::get('/books', 'BooksController@getCollection')->name('books.index');
 
-// endpoint to show a single book
+// // remove name('books.index');
+Route::get('/books', 'BooksController@getCollection')->name('books.index');
+// // remove name('books.store')
+Route::post('/books', 'BooksController@post')->name('books.store');//->middleware('auth.admin');
+// // to be continued
+Route::post('/books/{bookId}/reviews', 'BooksController@postReview')->name('reviews.store');
+
+
+
+// our added endpoints for the system 
 Route::get('/books/{id}', 'BooksController@showBook')->name('books.show');
 Route::delete('/books/{id}','BooksController@deleteBook')->name('books.destroy');
 Route::put('/books/{id}','BooksController@updateBook')->name('books.update');
 Route::patch('/books/{id}','BooksController@updateBook')->name('books.update');
-// Route::post('/books', 'BooksController@post')->name('books.store')->middleware('auth.admin');
-Route::post('/books', 'BooksController@post')->name('books.store')->middleware('auth.admin');;
 
-Route::get('/books/{bookId}/reviews', 'BooksController@bookReview')->name('books.reviews')->middleware('auth.admin');
-Route::post('/books/{bookId}/reviews', 'BooksController@postReview')->name('reviews.store')->middleware('auth.admin');
-// Route::post('/books/{id}/reviews', 'BooksController@postReview')->name('reviews.store');
+Route::get('/books/{bookId}/reviews', 'BooksController@bookReview')->name('books.reviews');
+
 Route::get('/books/{bookId}/reviews/{id}', 'BooksController@showBookReview')->name('reviews.show');
 Route::patch('/books/{bookId}/reviews/{id}', 'BooksController@updateBookReview')->name('reviews.update');
 Route::put('/books/{bookId}/reviews/{id}', 'BooksController@updateBookReview')->name('reviews.update');

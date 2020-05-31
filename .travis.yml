@@ -8,7 +8,7 @@ php:
   - 7.2
 
 env:
-  - DB=sqlite
+  - DB_CONNECTION=sqlite
 
 cache:
   directories:
