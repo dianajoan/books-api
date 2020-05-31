@@ -45,9 +45,10 @@ class BooksController extends Controller
     public function getCollection(PublicRequest $request)
     {
         // @TODO implement
-
+        // check if there is request data to sort columns
         if ( $request->sortColumn ) {
             if ( $request->sortColumn === 'title' ) {
+
                 $books = Book::all();
 
                 $request->sortDirection ? ( $order = $request->sortDirection ) : ( $order = 'asc' );
@@ -58,24 +59,110 @@ class BooksController extends Controller
 
             } elseif ( $request->sortColumn === 'avg_review') {
 
-                $outputBooks = BookCollection::collection(Book::all());
-                $one = $outputBooks[0];
+                $bookRevsTotal = array();
+                $books = Book::all();
 
-                return $outputBooks;  
+                // getting array with book id and average review number per bk id
+                foreach ($books as $bk) {
+                    // getting all reviews per single book
+                    $revvz = BookReview::where('book_id', $bk->id)->get();
+                    
+                    // initializing total of revs per bk as an interger
+                    $total = 0;
+
+                    // summing up all reviews of the bk
+                    foreach ($revvz as $rev) {
+                        $total = $total + $rev->review;
+                    }
+
+                    // getting an average of all reviews
+                    $revavg = count($revvz) > 0 ? round($total/count($revvz),0) : 0;
+
+                    // adding values per book with book id and average reviews to empty array
+                    $bookRevsTotal[] = array(
+                        'book_id'   => $bk->id,
+                        'avgrevs'   => $revavg
+                    );
+
+                }
+
+                // looping through book id with avg revs to single sort avg revs colum
+                foreach ($bookRevsTotal as $key => $row) {
+                    $avgrevs[$key] = $row['avgrevs'];
+                }
+
+                // getting an array from above with avg revs only
+                $avgrevs = array_column($bookRevsTotal, 'avgrevs'); 
+
+                // sorting the above array to ascending or decending given the request
+                if ($request->sortDirection === 'DESC') {
+                    array_multisort($avgrevs, SORT_DESC, $bookRevsTotal);
+                } else {
+                    array_multisort($avgrevs, SORT_ASC, $bookRevsTotal);
+                }
+
+                // now the array is sorted with book ids and avg revs
+                // initialize an empty array to return content of $bookRevsTotal
+                $finalResponse = array();
+
+                foreach ($bookRevsTotal as $bookAndRev) {
+                    $finalResponse[] = $this->showBook($bookAndRev['book_id']);
+                }
+
+                return response()->json(['data' => $finalResponse], JsonResponse::HTTP_OK);
             }
 
             return response()->json([
-                'error' => 'Sorry, no books found under that category!'
+                'error' => 'Sorry, no books found under that author category!'
             ], JsonResponse::HTTP_NOT_FOUND);
         }
 
+        if ( $request->authors ) {
+            $bookAuthorsTotal = array();
+            $books = Book::all();
 
+            $bookAuthrArr = array();
 
+            // getting array with book id and authors number per bk id
+            foreach ($books as $bk) {
+                // 
+                $bkAuth = BookAuthor::where('book_id', $bk->id)->get();
+
+                foreach ($bkAuth as $value) {
+                    array_push($bookAuthrArr, $value);
+                }
+            }
+
+            $inputAuthr = explode(',', trim($request->authors));
+
+            $filteredArr = array();
+
+            foreach ($bookAuthrArr as $value) {
+                foreach ($inputAuthr as $inputValue) {
+                    if ($value['author_id'] === $inputValue ) {
+                        $filteredArr[] = array('book_id' => $value['book_id']);
+                    }
+                }
+            }
+
+            $filteredAr = array_unique($filteredArr, 0);
+
+            $finalResponse = array();
+
+            foreach ($filteredAr as $bookAndAuthr) {
+                $finalResponse[] = $this->showBook($bookAndAuthr['book_id']);
+            }
+
+            return response()->json(['data' => $finalResponse], JsonResponse::HTTP_OK);
+        }
+
+        // if no book found
         if (sizeof(Book::all()) < 1) {
             return response()->json([
                 'error' => 'No books found'
             ], JsonResponse::HTTP_NOT_FOUND);
         }
+
         return BookCollection::collection(Book::paginate(15));   
     }
 
